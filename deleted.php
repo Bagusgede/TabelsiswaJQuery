@@ -5,6 +5,6 @@ $id = $_POST['id'];
 
 unset($_SESSION['datasiswa'][$id]);
 
-echo "Berhasil";
+header("Location:index.php");
 
 ?>
