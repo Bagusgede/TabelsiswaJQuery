@@ -1,0 +1,13 @@
+{
+  "name": "bagusgede/tokomini",
+  "description": "meluncur",
+  "type": "project",
+  "license": "MIT",
+  "require": {
+    "php": ">=7.2",
+    "ext-pdo": "*",
+    "ext-pdo_mysql": "*",
+    "phpmailer/phpmailer": "~6.1",
+    "twilio/sdk": "^5.42"
+  }
+}

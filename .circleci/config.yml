@@ -1,0 +1,104 @@
+# PHP CircleCI 2.0 configuration file
+#
+# Check https://circleci.com/docs/2.0/language-php/ for more details
+#
+version: 2
+jobs:
+  build:
+    working_directory: ~/purple-cms
+    docker:
+      # Specify the version you desire here
+      - image: circleci/php:7.3.9-apache-node-browsers
+      # - image: circleci/mysql:5.7.28
+      #   environment:
+      #     MYSQL_ROOT_PASSWORD: $MYSQL_ROOT_PASSWORD
+      #     MYSQL_DATABASE: $MYSQL_DATABASE
+      #     MYSQL_USER: $MYSQL_USER
+      #     MYSQL_PASSWORD: $MYSQL_PASSWORD
+      # Specify service dependencies here if necessary
+      # CircleCI maintains a library of pre-built images
+      # documented at https://circleci.com/docs/2.0/circleci-images/
+      # Using the RAM variation mitigates I/O contention
+      # for database intensive operations.
+      # - image: circleci/mysql:5.7-ram
+      #
+      # - image: redis:2.8.19
+
+    steps:
+      - checkout
+      - run: sudo  apt update # PHP CircleCI 2.0 Configuration File# PHP CircleCI 2.0 Configuration File sudo apt install zlib1g-dev libsqlite3-dev
+      - run: sudo apt-get install sshpass
+      - run: sudo docker-php-ext-install pdo_mysql
+      # - run:
+      # Our primary container isn't MYSQL so run a sleep command until it's ready.
+      #     name: Waiting for MySQL to be ready
+      #     command: |
+      #       for i in `seq 1 10`;
+      #       do
+      #         nc -z 127.0.0.1 3306 && echo Success && exit 0
+      #         echo -n .
+      #         sleep 1
+      #       done
+      #       echo Failed waiting for MySQL && exit 1
+      # - run:
+      #     name: Install MySQL CLI
+      #     command: |
+      #       sudo apt-get install default-mysql-client
+
+      # Download and cache dependencies
+      - restore_cache:
+          keys:
+            # "composer.lock" can be used if it is committed to the repo
+            - v1-dependencies-{{ checksum "composer.json" }}
+            # fallback to using the latest cache if no exact match is found
+            - v1-dependencies-
+
+      - run: composer install -n --prefer-dist
+
+      - save_cache:
+          key: v1-dependencies-{{ checksum "composer.json" }}
+          paths:
+            - ./vendor
+
+  deploy:
+    # Deploy to Heroku
+    # docker:
+    #   - image: buildpack-deps:trusty
+    # steps:
+    #   - checkout
+    #   - run:
+    #       name: Deploy Master to Heroku
+    #       command: |
+    #         git push https://heroku:$HEROKU_API_KEY@git.heroku.com/$HEROKU_APP_NAME.git master
+
+    # Deploy to server with ssh
+    machine:
+      enabled: true
+    steps:
+      - checkout
+      # - add_ssh_keys:
+      #     fingerprints:
+      #       - "ca:a6:fb:48:63:20:c4:90:dc:98:b2:bd:13:a6:a9:c5"
+      # - run:
+      #     name: fix host authenticity for production server
+      #     command: ssh-keyscan $SSH_HOST >> ~/.ssh/known_hosts
+      - run: sudo apt-get update
+      - run: sudo apt-get install sshpass
+      - run:
+          name: deploy app
+          command: sshpass -p "$SSH_PASSWORD" rsync -zruh --delete-before --progress * -e "ssh -p $SSH_PORT" $SSH_USER@$SSH_HOST:$SSH_DEPLOY_PATH
+      - run:
+          name: run composer install
+          command: sshpass -p "$SSH_PASSWORD" ssh -t -oStrictHostKeyChecking=no "$SSH_USER@$SSH_HOST" -p $SSH_PORT "cd $SSH_DEPLOY_PATH ; if [ ! -d "$SSH_DEPLOY_PATH_VENDOR" ]; then composer install -n ; else composer update ; fi"
+
+workflows:
+  version: 2
+  build-deploy:
+    jobs:
+      - build
+      - deploy:
+          requires:
+            - build
+          filters:
+            branches:
+              only: master
