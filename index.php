@@ -64,8 +64,8 @@ $kelas = isset($_GET['kelas']) ? $_GET['kelas'] : null
                         <td><?= $kelassiswa ?></td>
                         <td><?= $teleponsiswa ?></td>
                         <td><?= $alamatsiswa ?></td>
-                        <td> <a class="uk-button uk-button-danger tombol-hapus" href="#" uk-toggle data-id="<?=$key ?>"
-                                data-modal="#modal-center">Deleted</a></td>
+                        <td> <a class="uk-button uk-button-danger tombol-hapus" href="#"  data-id="<?=$key ?>"
+                                data-modal="#modal-center">Delete</a></td>
 
                         <?php
            } else {
@@ -77,30 +77,26 @@ $kelas = isset($_GET['kelas']) ? $_GET['kelas'] : null
                         <td><?= $kelassiswa ?></td>
                         <td><?= $teleponsiswa ?></td>
                         <td><?= $alamatsiswa ?></td>
+                        <td> <a class="uk-button uk-button-danger tombol-hapus" href="#"  data-id="<?=$key ?>"
+                                data-modal="#modal-center">Delete</a></td>
                         <?php   
                }
             }
-            ?>
-<?php
-    require 'file-hapus.php';
-?>
-
-                        <?php
                 $i++; 
                
                 endforeach;
          
                 ?>
 
-
-            </table>
-        </div>
-        </tbody>
-
-
-                <?php
+</tbody>
+<?php
                     require 'file-hapus.php';
                 ?>
+            </table>
+        </div>
+
+
+              
 
         <a class="uk-button uk-button-secondary" href="#modal-sections" uk-toggle>Tambah</a> ||
 
@@ -172,6 +168,7 @@ $kelas = isset($_GET['kelas']) ? $_GET['kelas'] : null
                 return false;
             })
 
+// FORM TAMBAH
         var form;
         $('#tambahdata').submit(function(event) {
             if (form) {
@@ -193,7 +190,8 @@ $kelas = isset($_GET['kelas']) ? $_GET['kelas'] : null
             form.done(function(data) {
                 console.log(data);
                 // untuk load data\
-                if(data== "berhasil") {
+                if(data== "Berhasil") {
+                    $('#submittambah').html('yes...');
                     $("#loadtabel").load("loadtabel.php");
                     UIkit.modal("#modal-sections").hide(); 
                 }else{
@@ -203,14 +201,16 @@ $kelas = isset($_GET['kelas']) ? $_GET['kelas'] : null
             });
 
             form.always(function () {
-                $("#tambahdata").find('input').prop("disabled", false);
-                $("#tambahdata").find('select').prop("disabled", false);
-                $("#tambahdata").find('textarea').prop("disabled", false);
+                $("#tambahdata").find('input').val("");
+                $("#tambahdata").find('select').val("");
+                $("#tambahdata").find('textarea').val("");
             });
 
             event.preventDefault();
         })
             })
+
+
     </script>
 </body>
 

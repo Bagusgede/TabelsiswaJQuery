@@ -23,6 +23,6 @@ $_SESSION['datasiswa'][$keybaru] =[
             'alamat' =>  $alamat,
 ];
 
-echo "berhasil";
+echo "Berhasil";
 
 ?>

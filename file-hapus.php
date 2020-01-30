@@ -7,12 +7,12 @@
             <h2>Are Youd Sure?</h2>
             <p>Are you sure you want to delete this student data?</p>
             <div class=" uk-text-right">
-                <form action="deleted.php" method="post">
+                <form id="deletesiswa" action="" method="post">
                     <input type="hidden" name="id" value="" class="id">
                     <button class="uk-button uk-button-primary uk-button-small uk-modal-close"
                         style="font-family:'Poppins', sans-serif; border-radius:50px;">Cancel</button>
 
-                    <button type="submit" class="uk-button uk-button-danger uk-button-small"
+                    <button id="submitdelete" type="submit" class="uk-button uk-button-danger uk-button-small"
                         style="font-family:'Poppins', sans-serif; border-radius:50px;">Deleted</button>
                 </form>
             </div>
@@ -37,7 +37,54 @@ $(document).ready(function () {
         // Untuk munculin atau close modal ada di dokumentasi UIKit
         UIkit.modal(modal).show();
         return false;
-
     })
-})
+
+
+         // FORM DELETED
+
+                var formdel;
+        $('#deletesiswa').submit(function(event) {
+            console.log('dasd');
+            if (formdel) {
+                formdel.abort();
+            }
+
+            formdel = $.ajax({
+                url: 'deleted.php',
+                type: "POST",
+                beforeSend: function() {
+                    $('#submitdelete').html('Loading...');
+                },
+                data: $('#deletesiswa').serialize(),
+                // contentType: false,
+                cache: false,
+                // processData:false
+            });
+
+            formdel.done(function(data) {
+                console.log(data);
+                UIkit.modal("#modal-center").hide(); 
+
+                $('body').find('#modal-center').remove();
+                // untuk load data\
+                if(data== "Berhasil") {
+                    $('#submitdelete').html('yes...');
+                    window.location='index.php';
+                }else{
+                    alert ("gagal nambah cuk");
+                }
+          
+            });
+
+            formdel.always(function () {
+                $("#deletesiswa").find('input').val("");
+                $("#deletesiswa").find('select').val("");
+                $("#deletesiswa").find('textarea').val("");
+            });
+
+            event.preventDefault();
+        })
+            })
+
+   
 </script>
